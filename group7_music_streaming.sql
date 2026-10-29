@@ -26,6 +26,7 @@
 -- TODO: DROP TABLE Playlist_Track
 -- TODO: DROP TABLE Playlist
 -- TODO: DROP TABLE Track
+DROP TABLE Track_T CASCADE CONSTRAINTS PURGE;
 -- TODO: DROP TABLE Album
 -- TODO: DROP TABLE Administrator
 -- TODO: DROP TABLE Artist
@@ -82,7 +83,15 @@
 -- Business rule: deleting an Album deletes its Tracks (ON DELETE CASCADE)
 -- --------------------------------------------------------------------------
 -- TODO: CREATE TABLE Track
+CREATE TABLE Track_T ( 
+    Track_ID    NUMBER          PRIMARY KEY,
+    Title       VARCHAR2(50)    NOT NULL,
+    Duration    NUMBER          NOT NULL,
 
+    Album_ID    VARCHAR2(50)    NOT NULL,
+
+    CONSTRAINT Track_Album_FK FOREIGN KEY (Album_ID) REFERENCES Album_T (Album_ID)
+);
 
 -- --------------------------------------------------------------------------
 -- Table: Playlist
@@ -90,7 +99,15 @@
 --          Listener_ID (FK -> Listener)
 -- --------------------------------------------------------------------------
 -- TODO: CREATE TABLE Playlist
+CREATE TABLE Playlist_T (
+    Playlist_ID     NUMBER          PRIMARY KEY,
+    Playlist_Name   VARCHAR2(50)    NOT NULL,
+    Creation_Date   DATE            NOT NULL,
 
+    Listener_ID     NUMBER          NOT NULL,
+
+    CONSTRAINT Playlist_Listener_FK FOREIGN KEY (Listener_ID) REFERENCES Listener_T (Account_ID)
+);
 
 -- --------------------------------------------------------------------------
 -- Table: Playlist_Track (bridge table: Playlist M:N Track)
