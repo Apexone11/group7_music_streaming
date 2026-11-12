@@ -188,7 +188,8 @@ CREATE TABLE Playlist_Track_T
 
     CONSTRAINT Playlist_Track_PK PRIMARY KEY (Playlist_ID, Track_ID),
     CONSTRAINT Playlist_Track_Playlist_FK FOREIGN KEY (Playlist_ID) REFERENCES Playlist_T (Playlist_ID) ON DELETE CASCADE,
-    CONSTRAINT Playlist_Track_Track_FK FOREIGN KEY (Track_ID) REFERENCES Track_T (Track_ID) ON DELETE CASCADE
+    CONSTRAINT Playlist_Track_Track_FK FOREIGN KEY (Track_ID) REFERENCES Track_T (Track_ID) ON DELETE CASCADE,
+    CONSTRAINT Playlist_Track_Order_CK CHECK (Track_Order > 0)
 );
 
 
@@ -246,7 +247,23 @@ CREATE TABLE Artist_Payout_T
     CONSTRAINT Artist_Payout_Amount_CK CHECK (Amount >= 0)
 );
 
+-- ==========================================================================
+-- SECTION 2.5: INDEXES
+-- These indexes prevent full table scans, speeding up query times
+-- as the database grows with more streams.
+-- ==========================================================================
 
+-- Allows the system to instantly find all streams for a specific track.
+CREATE INDEX idx_stream_track ON Stream_History_T(Track_ID);
+
+-- Acts as a directory of albums sorted by artist. 
+CREATE INDEX idx_album_artist ON Album_T(Artist_ID);
+
+-- Groups listening history by user.
+CREATE INDEX idx_stream_listener ON Stream_History_T(Listener_ID);
+
+-- Groups following records by user.
+CREATE INDEX idx_follower_listener ON Artist_Follower_T(Listener_ID);
 -- ==========================================================================
 -- SECTION 3: INSERT SAMPLE DATA
 -- Insert into parent tables before child tables.
