@@ -59,8 +59,21 @@ CREATE TABLE Account_T
     Account_ID NUMBER(10) PRIMARY KEY,
     Name       VARCHAR2(50) NOT NULL,
     Email      VARCHAR2(60) NOT NULL,
-    Join_Date  DATE         NOT NULL
+    Join_Date  DATE         DEFAULT SYSDATE NOT NULL,
+
+    CONSTRAINT Account_Email_UQ UNIQUE (Email),
+    CONSTRAINT Account_Email_CK CHECK (Email LIKE '%_@_%._%')
 );
+
+-- Makes sure that Join Dates aren't in the future
+CREATE OR REPLACE TRIGGER Account_JoinDate_TRG
+BEFORE INSERT OR UPDATE OF Join_Date ON Account_T
+FOR EACH ROW
+BEGIN
+    IF :NEW.Join_Date > SYSDATE THEN
+        RAISE_APPLICATION_ERROR(-20001, 'Join_Date cannot be in the future.');
+    END IF;
+END;
 
 -- --------------------------------------------------------------------------
 -- Table: Listener_T (subclass of Account)
@@ -102,7 +115,8 @@ CREATE TABLE Administrator_T
     Clearance_Level NUMBER(1)       NOT NULL, -- thir is only 1,2,3,4 levels 
     Role_Title      VARCHAR2(40) NOT NULL,
 
-    CONSTRAINT Administrator_Account_FK FOREIGN KEY (Account_ID) REFERENCES Account_T (Account_ID) ON DELETE CASCADE
+    CONSTRAINT Administrator_Account_FK FOREIGN KEY (Account_ID) REFERENCES Account_T (Account_ID) ON DELETE CASCADE,
+    CONSTRAINT Administrator_Clearance_CK CHECK (Clearance_Level BETWEEN 1 AND 5)
 );
 
 
@@ -139,7 +153,8 @@ CREATE TABLE Track_T
     Duration NUMBER(6)      NOT NULL,
     Album_ID NUMBER(10)     NOT NULL,
 
-    CONSTRAINT Track_Album_FK FOREIGN KEY (Album_ID) REFERENCES Album_T (Album_ID) ON DELETE CASCADE
+    CONSTRAINT Track_Album_FK FOREIGN KEY (Album_ID) REFERENCES Album_T (Album_ID) ON DELETE CASCADE,
+    CONSTRAINT Track_Duration_CK CHECK (Duration > 0)
 );
 
 -- --------------------------------------------------------------------------
