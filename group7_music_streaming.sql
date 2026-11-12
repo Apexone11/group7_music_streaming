@@ -56,8 +56,8 @@ DROP TABLE Account_T CASCADE CONSTRAINTS PURGE;
 
 CREATE TABLE Account_T
 (
-    Account_ID NUMBER PRIMARY KEY,
-    Name       VARCHAR2(40) NOT NULL,
+    Account_ID NUMBER(10) PRIMARY KEY,
+    Name       VARCHAR2(50) NOT NULL,
     Email      VARCHAR2(60) NOT NULL,
     Join_Date  DATE         NOT NULL
 );
@@ -69,7 +69,7 @@ CREATE TABLE Account_T
 
 CREATE TABLE Listener_T
 (
-    Account_ID        NUMBER PRIMARY KEY,
+    Account_ID        NUMBER(10) PRIMARY KEY,
     Subscription_Type VARCHAR2(20) NOT NULL,
 
     CONSTRAINT Listener_Account_FK FOREIGN KEY (Account_ID) REFERENCES Account_T (Account_ID) ON DELETE CASCADE
@@ -82,7 +82,7 @@ CREATE TABLE Listener_T
 
 CREATE TABLE Artist_T
 (
-    Account_ID      NUMBER PRIMARY KEY,
+    Account_ID      NUMBER(10) PRIMARY KEY,
     Stage_Name      VARCHAR2(50)  NOT NULL,
     Bio             VARCHAR2(500),
     Verified_Status CHAR(1) DEFAULT 'N' NOT NULL,
@@ -99,7 +99,7 @@ CREATE TABLE Artist_T
 CREATE TABLE Administrator_T
 (
     Account_ID      NUMBER PRIMARY KEY,
-    Clearance_Level NUMBER       NOT NULL,
+    Clearance_Level NUMBER(1)       NOT NULL, -- thir is only 1,2,3,4 levels 
     Role_Title      VARCHAR2(40) NOT NULL,
 
     CONSTRAINT Administrator_Account_FK FOREIGN KEY (Account_ID) REFERENCES Account_T (Account_ID) ON DELETE CASCADE
@@ -115,11 +115,11 @@ CREATE TABLE Administrator_T
 
 CREATE TABLE Album_T
 (
-    Album_ID     NUMBER PRIMARY KEY,
+    Album_ID     NUMBER(10) PRIMARY KEY,
     Title        VARCHAR2(50) NOT NULL,
     Release_Date DATE         NOT NULL,
     Genre        VARCHAR2(30) NOT NULL,
-    Artist_ID    NUMBER       NOT NULL,
+    Artist_ID    NUMBER(10)       NOT NULL,
 
     CONSTRAINT Album_Artist_FK FOREIGN KEY (Artist_ID) REFERENCES Artist_T (Account_ID) ON DELETE CASCADE
 );
@@ -134,10 +134,10 @@ CREATE TABLE Album_T
 
 CREATE TABLE Track_T
 (
-    Track_ID NUMBER PRIMARY KEY,
+    Track_ID NUMBER(10) PRIMARY KEY,
     Title    VARCHAR2(50) NOT NULL,
-    Duration NUMBER       NOT NULL,
-    Album_ID NUMBER       NOT NULL,
+    Duration NUMBER(6)      NOT NULL,
+    Album_ID NUMBER(10)     NOT NULL,
 
     CONSTRAINT Track_Album_FK FOREIGN KEY (Album_ID) REFERENCES Album_T (Album_ID) ON DELETE CASCADE
 );
@@ -150,10 +150,10 @@ CREATE TABLE Track_T
 
 CREATE TABLE Playlist_T
 (
-    Playlist_ID   NUMBER PRIMARY KEY,
+    Playlist_ID   NUMBER(10) PRIMARY KEY,
     Playlist_Name VARCHAR2(50) NOT NULL,
     Creation_Date DATE         NOT NULL,
-    Listener_ID   NUMBER       NOT NULL,
+    Listener_ID   NUMBER(10)       NOT NULL,
 
     CONSTRAINT Playlist_Listener_FK FOREIGN KEY (Listener_ID) REFERENCES Listener_T (Account_ID)
 );
@@ -166,10 +166,10 @@ CREATE TABLE Playlist_T
 
 CREATE TABLE Playlist_Track_T
 (
-    Playlist_ID NUMBER NOT NULL,
-    Track_ID    NUMBER NOT NULL,
+    Playlist_ID NUMBER(10) NOT NULL,
+    Track_ID    NUMBER(10) NOT NULL,
     Date_Added  DATE   NOT NULL,
-    Track_Order NUMBER NOT NULL,
+    Track_Order NUMBER(10) NOT NULL,
 
     CONSTRAINT Playlist_Track_PK PRIMARY KEY (Playlist_ID, Track_ID),
     CONSTRAINT Playlist_Track_Playlist_FK FOREIGN KEY (Playlist_ID) REFERENCES Playlist_T (Playlist_ID) ON DELETE CASCADE,
@@ -185,10 +185,10 @@ CREATE TABLE Playlist_Track_T
 
 CREATE TABLE Stream_History_T
 (
-    Stream_ID        NUMBER PRIMARY KEY,
-    Stream_Timestamp TIMESTAMP NOT NULL,
-    Listener_ID      NUMBER    NOT NULL,
-    Track_ID         NUMBER    NOT NULL,
+    Stream_ID        NUMBER(10) PRIMARY KEY,
+    Stream_Timestamp TIMESTAMP     NOT NULL,
+    Listener_ID      NUMBER(10)    NOT NULL,
+    Track_ID         NUMBER(10)    NOT NULL,
 
     CONSTRAINT Stream_History_Listener_FK FOREIGN KEY (Listener_ID) REFERENCES Listener_T (Account_ID),
     CONSTRAINT Stream_History_Track_FK FOREIGN KEY (Track_ID) REFERENCES Track_T (Track_ID)
@@ -203,8 +203,8 @@ CREATE TABLE Stream_History_T
 
 CREATE TABLE Artist_Follower_T
 (
-    Listener_ID NUMBER NOT NULL,
-    Artist_ID   NUMBER NOT NULL,
+    Listener_ID NUMBER(10) NOT NULL,
+    Artist_ID   NUMBER(10) NOT NULL,
     Follow_Date DATE   NOT NULL,
 
     CONSTRAINT Artist_Follower_PK PRIMARY KEY (Listener_ID, Artist_ID),
@@ -221,11 +221,11 @@ CREATE TABLE Artist_Follower_T
 
 CREATE TABLE Artist_Payout_T
 (
-    Payout_ID      NUMBER PRIMARY KEY,
-    Amount         NUMBER(10, 2) NOT NULL,
+    Payout_ID      NUMBER(10) PRIMARY KEY,
+    Amount         NUMBER(10,2) NOT NULL,
     Payout_Date    DATE          NOT NULL,
     Payment_Method VARCHAR2(30)  NOT NULL,
-    Artist_ID      NUMBER        NOT NULL,
+    Artist_ID      NUMBER(10)        NOT NULL,
 
     CONSTRAINT Artist_Payout_Artist_FK FOREIGN KEY (Artist_ID) REFERENCES Artist_T (Account_ID),
     CONSTRAINT Artist_Payout_Amount_CK CHECK (Amount >= 0)
